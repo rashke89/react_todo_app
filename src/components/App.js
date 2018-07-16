@@ -27,8 +27,15 @@ export default class App extends Component {
 
         this.state = {
             todo_list
-        }
+        };
+
+        /**BIND METHODS*/
+        this.createTask = this.createTask.bind(this);
+        this.toggleTask = this.toggleTask.bind(this);
+        this.saveTask = this.saveTask.bind(this);
+        this.deleteTask = this.deleteTask.bind(this);
     }
+
     /**RENDER*/
     render() {
         return (
@@ -42,13 +49,62 @@ export default class App extends Component {
                 <h1>To Do App</h1>
 
                 {/*CREATE TODO*/}
-                <CreateTodo />
+                <CreateTodo
+                    createTask={this.createTask}
+                    todo_list={this.state.todo_list}
+                />
 
                 {/*TABLE*/}
                 <div className="todo-table">
-                    <TodoList todo={this.state.todo_list} />
+                    <TodoList
+                        todo={this.state.todo_list}
+                        toggleTask={this.toggleTask}
+                        saveTask={this.saveTask}
+                        deleteTask={this.deleteTask}
+                    />
                 </div>
             </div>
         );
+    }
+
+    /**CREATE TASK*/
+    createTask(task) {
+        this.state.todo_list.push({
+            task,
+            is_done: false
+        });
+
+        this.setState({
+            todo_list: this.state.todo_list
+        });
+    }
+
+    /**TOGGLE TASK*/
+    toggleTask(task) {
+        const find_task = this.state.todo_list.find((todo) => todo.task == task);
+
+        find_task && (find_task.is_done = !find_task.is_done,
+            this.setState({
+                todo_list: this.state.todo_list
+            }));
+    }
+
+    /**EDIT TASK*/
+    saveTask(old_task, new_task) {
+        let find_task = this.state.todo_list.find((todo) => todo.task == old_task);
+        find_task && (find_task.task = new_task,
+            this.setState({
+                todo_list: this.state.todo_list
+            }));
+    }
+
+    /**DELETE TASK*/
+    deleteTask(task_to_delete) {
+        let task_index = this.state.todo_list.findIndex(task => task.task == task_to_delete);
+
+        task_index != -1 && (this.state.todo_list.splice(task_index, 1),
+            this.setState({
+                todo_list: this.state.todo_list
+            }));
     }
 }

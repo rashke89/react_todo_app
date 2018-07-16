@@ -15,25 +15,27 @@ export default class TodoListItem extends React.Component {
         /**BIND METHODS*/
         this.onEditClick = this.onEditClick.bind(this);
         this.renderActionSection = this.renderActionSection.bind(this);
+        this.renderTaskSection = this.renderTaskSection.bind(this);
         this.onEditClick = this.onEditClick.bind(this);
+        this.onSaveClick = this.onSaveClick.bind(this);
     }
 
     /**RENDER*/
     render() {
         return (
             <tr>
-                <td>{this.props.task}</td>
+                {this.renderTaskSection()}
                 {this.renderActionSection()}
             </tr>
         )
     }
 
-    /**CHANGE BUTTONS*/
+    /**RENDER BUTTONS*/
     renderActionSection() {
-        if(this.state.is_editing) {
+        if (this.state.is_editing) {
             return (
                 <td>
-                    <button>Save</button>
+                    <button onClick={this.onSaveClick}>Save</button>
                     <button onClick={this.onEditClick}>Cancel</button>
                 </td>
             );
@@ -42,7 +44,34 @@ export default class TodoListItem extends React.Component {
         return (
             <td>
                 <button onClick={this.onEditClick}>Edit</button>
-                <button>Delete</button>
+                <button onClick={this.props.deleteTask.bind(this, this.props.task)}>Delete</button>
+            </td>
+        )
+    }
+
+    /**RENDER TASKS*/
+    renderTaskSection() {
+        let {task, is_done} = this.props;
+        let text_style = {
+            color: is_done ? 'green' : 'red',
+            cursor: 'pointer'
+        };
+
+        if(this.state.is_editing){
+            return (
+                <td>
+                    <form onSubmit={this.onSaveClick}>
+                        <input type="text" defaultValue={task} ref="editInput"/>
+                    </form>
+                </td>
+            )
+        }
+
+        return (
+            <td style={text_style}
+                onClick={this.props.toggleTask.bind(this, task)}
+            >
+                {task}
             </td>
         )
     }
@@ -56,10 +85,23 @@ export default class TodoListItem extends React.Component {
 
     /**CANCEL EDIT*/
     onCancelClick() {
-        console.log(this.state.is_editing);
         this.setState({
             is_editing: !this.state.is_editing
         });
-        console.log(this.state.is_editing);
+    }
+
+    /**SAVE EDITED TASK*/
+    onSaveClick(event) {
+        event.preventDefault();
+
+        let old_task = this.props.task;
+        let new_task = this.refs.editInput.value;
+
+        if(old_task && new_task) {
+            this.props.saveTask(old_task, new_task);
+            this.setState({
+                is_editing: !this.state.is_editing
+            })
+        }
     }
 }

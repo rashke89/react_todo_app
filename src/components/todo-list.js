@@ -9,12 +9,13 @@ export default class Todolist extends React.Component {
 
     /**RENDER ITEMS*/
     renderItems() {
-        return this.props.todo.map((todo, index) => <TodoListItem key={index} {...todo}/>)
+        let props = Object.assign({}, this.props);
+
+        return this.props.todo.map((todo, index) => <TodoListItem key={index} {...todo} {...props}/>)
     }
 
     /**RENDER*/
     render() {
-        console.log(this.props.todo);
         return (
             <table>
                 <TodoListHeader />
